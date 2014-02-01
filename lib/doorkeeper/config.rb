@@ -159,6 +159,7 @@ module Doorkeeper
     option :test_redirect_uri, :default => 'urn:ietf:wg:oauth:2.0:oob'
     option :active_record_options, :default => {}
     option :realm, :default => "Doorkeeper"
+    option :grant_flows, :default => [:authorization_code, :implicit, :resource_owner_password_credentials, :client_credentials]
 
     def refresh_token_enabled?
       !!@refresh_token_enabled
@@ -198,6 +199,37 @@ module Doorkeeper
 
     def realm
       @realm ||= "Doorkeeper"
+    end
+
+    def authorization_response_types
+      @authorization_response_types ||= calculate_authorization_response_types(grant_flows)
+    end
+
+    def token_grant_types
+      @token_grant_types ||= calculate_token_grant_types(grant_flows)
+    end
+
+  private
+
+    def calculate_authorization_response_types(flows)
+      response_types = []
+      response_types << :code  if flows.include? :authorization_code
+      response_types << :token if flows.include? :implicit
+
+      response_types
+    end
+
+    def calculate_token_grant_types(flows)
+      response_types = []
+
+      response_types << :authorization_code if flows.include? :authorization_code
+      response_types << :password           if flows.include? :resource_owner_password_credentials
+      response_types << :client_credentials if flows.include? :client_credentials
+
+      # FIXME: allow this response type accoring to refresh_token_enabled option
+      response_types << :refresh_token
+
+      response_types
     end
   end
 end

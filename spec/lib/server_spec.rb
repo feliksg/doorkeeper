@@ -19,6 +19,20 @@ describe Doorkeeper::Server do
       expect { subject.token_request(:code) }.to raise_error(Doorkeeper::Errors::InvalidTokenStrategy)
     end
 
+    context 'when only Authorization Code strategy is enabled' do
+      before do
+        Doorkeeper.configuration.stub(:grant_flows) { [:authorization_code] }
+      end
+
+      it 'raises error when using the disabled Implicit strategy' do
+        expect { subject.authorization_request(:token) }.to raise_error(Doorkeeper::Errors::InvalidAuthorizationStrategy)
+      end
+
+      it 'raises error when using the disabled Client Credentials strategy' do
+        expect { subject.token_request(:client_credentials) }.to raise_error(Doorkeeper::Errors::InvalidTokenStrategy)
+      end
+    end
+
     it 'builds the request with selected strategy' do
       stub_const 'Doorkeeper::Request::Code', fake_class
       expect(fake_class).to receive(:build).with(subject)

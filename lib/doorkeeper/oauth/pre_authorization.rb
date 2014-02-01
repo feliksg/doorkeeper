@@ -39,7 +39,10 @@ module Doorkeeper
     private
 
       def validate_response_type
-        %w[code token].include? response_type
+        # OLD CODE: %w[code token].include? response_type
+        # FIXME: the checking of strategies is done in Doorkeeper::Request.
+        # Is it proper to check the same logic here?
+        server.authorization_response_types.include? response_type.try(:to_sym)
       end
 
       def validate_client

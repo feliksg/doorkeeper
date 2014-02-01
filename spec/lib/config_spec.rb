@@ -167,6 +167,71 @@ describe Doorkeeper, "configuration" do
     end
   end
 
+  describe "grant_flows" do
+    it "is set to all grant flows by default" do
+      Doorkeeper.configuration.grant_flows.should == [
+        :authorization_code,
+        :implicit,
+        :resource_owner_password_credentials,
+        :client_credentials
+      ]
+    end
+    it "can change the value" do
+      Doorkeeper.configure {
+        orm DOORKEEPER_ORM
+        grant_flows [ :authorization_code, :implicit ]
+      }
+      subject.grant_flows.should == [:authorization_code, :implicit]
+    end
+    context "when including ':authorization_code'" do
+      before do
+        Doorkeeper.configure {
+          orm DOORKEEPER_ORM
+          grant_flows [ :authorization_code ]
+        }
+      end
+      it "includes ':code' in authorization_response_types" do
+        subject.authorization_response_types.should include :code
+      end
+      it "includes ':authorization_code' in token_grant_types" do
+        subject.token_grant_types.should include :authorization_code
+      end
+    end
+    context "when including ':implicit'" do
+      before do
+        Doorkeeper.configure {
+          orm DOORKEEPER_ORM
+          grant_flows [ :implicit ]
+        }
+      end
+      it "includes ':token' in authorization_response_types" do
+        subject.authorization_response_types.should include :token
+      end
+    end
+    context "when including ':resource_owner_password_credentials'" do
+      before do
+        Doorkeeper.configure {
+          orm DOORKEEPER_ORM
+          grant_flows [ :resource_owner_password_credentials ]
+        }
+      end
+      it "includes ':password' in token_grant_types" do
+        subject.token_grant_types.should include :password
+      end
+    end
+    context "when including ':client_credentials'" do
+      before do
+        Doorkeeper.configure {
+          orm DOORKEEPER_ORM
+          grant_flows [ :client_credentials ]
+        }
+      end
+      it "includes ':password' in token_grant_types" do
+        subject.token_grant_types.should include :client_credentials
+      end
+    end
+  end
+
   it 'raises an exception when configuration is not set' do
     old_config = Doorkeeper.configuration
     Doorkeeper.module_eval do

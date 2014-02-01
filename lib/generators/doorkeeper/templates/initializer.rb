@@ -58,6 +58,18 @@ Doorkeeper.configure do
   #
   # test_redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
 
+  # Change what grant flows are enabled
+  # By default it enables all the four grant flows. Remove any of them from
+  # the array to disable.
+  #
+  # grant_flows [
+  #               :authorization_code,
+  #               :implicit,
+  #               :resource_owner_password_credentials,
+  #               :client_credentials
+  #             ]
+
+
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
   # For example if dealing with trusted a application.
